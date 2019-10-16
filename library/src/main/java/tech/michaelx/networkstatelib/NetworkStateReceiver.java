@@ -11,6 +11,6 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        NetworkStateManager.getDefault(context).post(context);
+        NetworkStateWatcher.getDefault(context).post(context);
     }
 }

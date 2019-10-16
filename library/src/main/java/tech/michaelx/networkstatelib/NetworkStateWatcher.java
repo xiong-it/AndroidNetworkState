@@ -14,19 +14,19 @@ import java.util.List;
  * @version 1.0
  * @since 2019/5/22
  */
-public final class NetworkStateManager {
-    private List<WeakReference<NetworkStateObserver>> mObservers;
-    private static NetworkStateManager sManager;
+public final class NetworkStateWatcher {
+    private List<WeakReference<NetworkStateObserver>> mObservers = new ArrayList<>();
+    private static NetworkStateWatcher sWatcher;
     private static BroadcastReceiver sReceiver;
 
-    public static NetworkStateManager getDefault(Context context) {
-        if (sManager == null) {
-            synchronized (NetworkStateManager.class) {
-                sManager = new NetworkStateManager();
+    public static NetworkStateWatcher getDefault(Context context) {
+        if (sWatcher == null) {
+            synchronized (NetworkStateWatcher.class) {
+                sWatcher = new NetworkStateWatcher();
                 registerReceiver(context);
             }
         }
-        return sManager;
+        return sWatcher;
     }
 
     private static void registerReceiver(Context context) {
@@ -46,7 +46,7 @@ public final class NetworkStateManager {
      */
     public void register(NetworkStateObserver observer) {
         if (mObservers == null) {
-            synchronized (NetworkStateManager.class) {
+            synchronized (NetworkStateWatcher.class) {
                 mObservers = new ArrayList<>();
             }
         }
@@ -76,9 +76,10 @@ public final class NetworkStateManager {
         if (mObservers == null || mObservers.isEmpty()) {
             return;
         }
-        for (WeakReference<NetworkStateObserver> observer : mObservers) {
-            if (observer.get() != null) {
-                observer.get().onNetworkStateChanged(NetworkUtils.getNetworkType(context));
+        for (WeakReference<NetworkStateObserver> observerRef : mObservers) {
+            NetworkStateObserver observer = observerRef.get();
+            if (observer != null) {
+                observer.onNetworkStateChanged(NetworkUtils.getNetworkTypeEnum(context));
             }
         }
     }
@@ -86,9 +87,9 @@ public final class NetworkStateManager {
     /**
      * 清理观察者
      *
-     * @param context
+     * @param context Android上下文
      */
-    public void clear(Context context) {
+    public void stopWatch(Context context) {
         if (mObservers != null) {
             mObservers.clear();
             mObservers = null;
@@ -99,7 +100,7 @@ public final class NetworkStateManager {
     /**
      * 注销广播接收者
      *
-     * @param context
+     * @param context Android上下文
      */
     private void unRegisterReceiver(Context context) {
         if (context != null) {

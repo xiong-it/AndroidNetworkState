@@ -10,7 +10,7 @@ public interface NetworkStateObserver {
     /**
      * 网络发生变化
      *
-     * @param netType 网络类型
+     * @param type 网络类型
      */
-    void onNetworkStateChanged(int netType);
+    void onNetworkStateChanged(NetworkTypeEnum type);
 }

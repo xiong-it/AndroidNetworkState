@@ -1,1 +1,1 @@
-include ':app', ':networkstatelib'
+include ':demo', ':library'
